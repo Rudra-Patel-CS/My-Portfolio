@@ -1,0 +1,241 @@
+@import "tailwindcss";
+
+/**
+ * COLORS — the palette lives here.
+ * Accent: electric blue + violet. Base: deep navy / black.
+ */
+@theme {
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Cormorant Garamond", ui-serif, Georgia, serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  --color-ink: #05070d;
+  --color-navy: #0b1220;
+  --color-panel: #10182a;
+  --color-cyan: #5ce1ff;
+  --color-blue: #3b82f6;
+  --color-violet: #8b5cf6;
+  --color-mist: #c9d4ea;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: #05070d;
+  color: #e8eefc;
+  overflow-x: hidden;
+}
+
+html.light body {
+  background: #e8eef8;
+  color: #0b1220;
+}
+
+html.light header {
+  background: rgba(232, 238, 248, 0.78) !important;
+}
+
+html.light h1,
+html.light h2,
+html.light h3,
+html.light .text-white,
+html.light .text-white\/90,
+html.light .text-white\/70,
+html.light .text-cyan-100 {
+  color: #0b1220 !important;
+}
+
+html.light .text-white\/65,
+html.light .text-white\/60,
+html.light .text-white\/50,
+html.light .text-white\/40 {
+  color: rgba(11, 18, 32, 0.62) !important;
+}
+
+.cursor-none,
+.cursor-none * {
+  cursor: none !important;
+}
+
+.glass {
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0.02)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 0 0 1px rgba(92, 225, 255, 0.04),
+    0 24px 60px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(18px);
+}
+
+html.light .glass {
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.72),
+    rgba(255, 255, 255, 0.4)
+  );
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 18px 40px rgba(15, 35, 70, 0.08);
+}
+
+/* --- Laptop 3D --- */
+.laptop-stage {
+  perspective: 1400px;
+  --zoom: 0.86;
+  --lid: -18deg;
+  --shake-x: 0px;
+  --shake-y: 0px;
+}
+
+.laptop {
+  transform: translate3d(var(--shake-x), var(--shake-y), 0) scale(var(--zoom));
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.laptop-lid,
+.laptop-base {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+.laptop-lid {
+  transform-origin: bottom center;
+  transform: rotateX(var(--lid));
+}
+
+.laptop-base {
+  transform: rotateX(72deg) translateZ(2px);
+}
+
+.scanlines {
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.18) 0px,
+    rgba(0, 0, 0, 0.18) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.rgb-split {
+  animation: rgbSplit 0.12s steps(2) infinite;
+}
+
+@keyframes rgbSplit {
+  0% {
+    text-shadow:
+      2px 0 #ff2a6d,
+      -2px 0 #5ce1ff;
+    filter: none;
+  }
+  50% {
+    text-shadow:
+      -3px 1px #ff2a6d,
+      3px -1px #5ce1ff;
+    filter: contrast(1.2) saturate(1.4);
+  }
+  100% {
+    text-shadow:
+      1px -2px #ff2a6d,
+      -1px 2px #5ce1ff;
+  }
+}
+
+@keyframes flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  40% {
+    opacity: 0.55;
+  }
+  42% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 0.2;
+  }
+  61% {
+    opacity: 1;
+  }
+}
+
+.vignette {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 40%,
+    rgba(0, 0, 0, 0.72) 100%
+  );
+}
+
+.glow-ring {
+  background: conic-gradient(
+    from 0deg,
+    #5ce1ff,
+    #3b82f6,
+    #8b5cf6,
+    #5ce1ff
+  );
+  animation: spin 8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+.blob-cursor-ripple {
+  animation: rippleOut 0.7s ease-out forwards;
+}
+
+@keyframes rippleOut {
+  from {
+    transform: scale(0.2);
+    opacity: 0.7;
+  }
+  to {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+::selection {
+  background: rgba(92, 225, 255, 0.3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .glow-ring,
+  .rgb-split,
+  .blob-cursor-ripple {
+    animation: none;
+  }
+}
