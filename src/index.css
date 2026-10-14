@@ -7,6 +7,7 @@
 @theme {
   --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Cormorant Garamond", ui-serif, Georgia, serif;
+  --font-script: "Great Vibes", "Alex Brush", cursive;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 
   --color-ink: #05070d;

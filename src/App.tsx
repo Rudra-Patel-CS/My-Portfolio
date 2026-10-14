@@ -29,7 +29,7 @@ export default function App() {
     const played = sessionStorage.getItem(SESSION_KEY) === '1'
     const minWait = new Promise((r) => setTimeout(r, 650))
 
-    void Promise.all([document.fonts.ready, preload('/profile.jpg'), minWait]).then(
+    void Promise.all([document.fonts.ready, preload('/profile_cutout.png'), minWait]).then(
       () => {
         setBooting(false)
         if (reduced || played) {

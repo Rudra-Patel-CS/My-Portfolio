@@ -15,7 +15,7 @@ export const PERSON = {
   subtitle: 'Computer Engineering Student | AI/ML • Cybersecurity • Full-Stack Development',
   institution: 'CHARUSAT',
   institutionFull: 'CSPIT, CHARUSAT',
-  photoSrc: '/profile.jpg',
+  photoSrc: '/profile_cutout.png',
   bio: 'I’m a computer engineering student at CHARUSAT who enjoys building practical technology from idea to implementation. My interests span artificial intelligence and machine learning, cybersecurity, and full-stack development. I’m especially interested in creating applications that are useful, understandable, and thoughtfully engineered.',
   disciplinesBio:
     'From machine-learning projects to full-stack applications, I use each project to explore how software, data, and security fit together. I also enjoy taking part in hackathons and CTFs, where I learn by solving problems and building with others.',
@@ -44,28 +44,20 @@ export const ROLES = [
   'Full-Stack Systems Builder',
 ]
 
-/** Terminal telemetry lines for the futuristic intro */
+/** Terminal telemetry lines for the 3D laptop intro */
 export const TERMINAL_LINES = [
-  'INITIALIZING SYSTEM ARCHITECTURE...',
-  'AUTHENTICATING IDENTITY: RUDRA PATEL',
-  'CSPIT, CHARUSAT — COMPUTER ENGINEERING',
-  'SYNCHRONIZING MODULES: AI/ML • CYBERSEC • FULL-STACK',
-  'ACCESS LEVEL: GRANTED · PORTFOLIO READY',
+  'initializing portfolio.exe',
+  'loading modules: AI/ML | CyberSec | FullStack',
+  'decrypting identity: Rudra Patel (CHARUSAT)...',
+  'access granted',
 ]
 
-/** Words displayed sequentially in the artistic Welcome animation */
-export const WELCOME_WORDS = [
-  { word: 'Welcome', highlight: false },
-  { word: 'To', highlight: false },
-  { word: "Rudra's", highlight: true },
-  { word: 'Universe', highlight: true },
-]
+export const WELCOME_TEXT = "Welcome to Rudra's World..."
 
 export const NAV_LINKS = [
-  { href: '#home', label: 'Home' },
-  { href: '#disciplines', label: 'Disciplines' },
-  { href: '#numbers', label: 'By The Numbers' },
-  { href: '#work', label: 'Explore Work' },
+  { href: '#home', label: 'Dashboard' },
+  { href: '#about', label: 'About Me' },
+  { href: '#work', label: 'Work (Projects)' },
   { href: '#contact', label: 'Get In Touch' },
 ] as const
 

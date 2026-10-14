@@ -3,29 +3,29 @@ import { motion } from 'framer-motion'
 import { PERSON } from '../../content'
 
 export function Hero() {
-  const cardRef = useRef<HTMLDivElement>(null)
-  const [rotateX, setRotateX] = useState(0)
-  const [rotateY, setRotateY] = useState(0)
+  const photoRef = useRef<HTMLDivElement>(null)
+  const [rotX, setRotX] = useState(0)
+  const [rotY, setRotY] = useState(0)
   const [copiedEmail, setCopiedEmail] = useState(false)
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return
-    const rect = cardRef.current.getBoundingClientRect()
+    if (!photoRef.current) return
+    const rect = photoRef.current.getBoundingClientRect()
     const x = e.clientX - rect.left
     const y = e.clientY - rect.top
     const centerX = rect.width / 2
     const centerY = rect.height / 2
 
-    const rotX = ((y - centerY) / centerY) * -14
-    const rotY = ((x - centerX) / centerX) * 14
+    const rX = ((y - centerY) / centerY) * -12
+    const rY = ((x - centerX) / centerX) * 12
 
-    setRotateX(rotX)
-    setRotateY(rotY)
+    setRotX(rX)
+    setRotY(rY)
   }
 
   const handleMouseLeave = () => {
-    setRotateX(0)
-    setRotateY(0)
+    setRotX(0)
+    setRotY(0)
   }
 
   const copyEmail = () => {
@@ -37,7 +37,7 @@ export function Hero() {
   return (
     <section
       id="home"
-      className="relative mx-auto grid max-w-6xl items-center gap-12 px-5 pt-12 pb-20 md:grid-cols-[1.15fr_0.85fr] md:pt-20 md:pb-28"
+      className="relative mx-auto grid max-w-6xl items-center gap-12 px-5 pt-8 pb-16 md:grid-cols-[1.1fr_0.9fr] md:pt-16 md:pb-24"
     >
       {/* Left text column */}
       <motion.div
@@ -59,7 +59,7 @@ export function Hero() {
           {PERSON.headline}
         </h1>
 
-        {/* Subtitle / Discipline Tag */}
+        {/* Subtitle */}
         <p className="mt-3 text-lg font-medium tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-sky-200 to-violet-300 sm:text-xl">
           {PERSON.subtitle}
         </p>
@@ -69,7 +69,7 @@ export function Hero() {
           {PERSON.bio}
         </p>
 
-        {/* CTA Buttons */}
+        {/* Action Buttons */}
         <div className="mt-8 flex flex-wrap items-center gap-3">
           <a
             href="#contact"
@@ -82,7 +82,12 @@ export function Hero() {
               viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M14 5l7 7m0 0l-7 7m7-7H3"
+              />
             </svg>
           </a>
 
@@ -90,7 +95,7 @@ export function Hero() {
             href="#work"
             className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-6 py-3 text-sm font-medium text-white/90 backdrop-blur-md transition-all hover:border-cyan-400/50 hover:bg-white/10 hover:text-cyan-200"
           >
-            <span>Explore my work</span>
+            <span>Work (Projects)</span>
           </a>
 
           <button
@@ -99,14 +104,24 @@ export function Hero() {
             className="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-4 py-3 font-mono text-xs text-white/70 transition-all hover:border-cyan-400/40 hover:text-cyan-300"
             title="Copy email to clipboard"
           >
-            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            <svg
+              className="h-3.5 w-3.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+              />
             </svg>
             <span>{copiedEmail ? 'Copied!' : 'Copy Email'}</span>
           </button>
         </div>
 
-        {/* Quick social icon pills */}
+        {/* Quick Social links */}
         <div className="mt-8 flex items-center gap-3 text-white/70">
           <SocialLink href={PERSON.socials.github} label="GitHub">
             <path d="M12 2C6.48 2 2 6.58 2 12.26c0 4.5 2.87 8.32 6.84 9.67.5.1.68-.22.68-.48 0-.24-.01-.87-.01-1.71-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.63.07-.63 1 .07 1.53 1.06 1.53 1.06.9 1.57 2.36 1.12 2.94.86.09-.67.35-1.12.63-1.37-2.22-.26-4.56-1.14-4.56-5.08 0-1.12.39-2.04 1.03-2.76-.1-.26-.45-1.3.1-2.7 0 0 .84-.27 2.75 1.05A9.3 9.3 0 0 1 12 7.5c.85 0 1.7.12 2.5.34 1.9-1.32 2.74-1.05 2.74-1.05.55 1.4.2 2.44.1 2.7.64.72 1.03 1.64 1.03 2.76 0 3.95-2.34 4.81-4.57 5.07.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .26.18.59.69.48A10.03 10.03 0 0 0 22 12.26C22 6.58 17.52 2 12 2Z" />
@@ -123,74 +138,60 @@ export function Hero() {
         </div>
       </motion.div>
 
-      {/* Right column: Extreme Level Attractive Photo Presentation */}
+      {/* Right column: Cutout photo without frame, joint with background + border */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
+        initial={{ opacity: 0, scale: 0.92 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.8, delay: 0.15 }}
         className="relative mx-auto flex items-center justify-center"
       >
         <div
-          ref={cardRef}
+          ref={photoRef}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
           style={{
-            transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
+            transform: `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg)`,
             transition: 'transform 0.15s ease-out',
           }}
-          className="group relative w-full max-w-[340px] sm:max-w-[380px]"
+          className="group relative flex flex-col items-center justify-center max-w-[420px]"
         >
-          {/* Multi-layered Animated Neon Energy Ring */}
-          <div className="absolute -inset-4 rounded-3xl bg-gradient-to-tr from-cyan-500 via-blue-600 to-violet-600 opacity-60 blur-2xl transition-all duration-500 group-hover:opacity-90 group-hover:blur-3xl" />
+          {/* Ambient luminous glow behind the cutout */}
+          <div className="pointer-events-none absolute -inset-6 rounded-full bg-gradient-to-tr from-cyan-500/30 via-blue-500/20 to-violet-600/30 blur-3xl opacity-70 group-hover:opacity-100 transition-opacity duration-500" />
 
-          {/* Outer rotating conic aura */}
-          <div className="pointer-events-none absolute -inset-1.5 rounded-3xl bg-gradient-to-r from-cyan-400 via-indigo-500 to-fuchsia-500 opacity-75 blur-[2px] transition duration-500 group-hover:opacity-100" />
+          {/* Cybernetic energy halo ring behind silhouette */}
+          <div className="pointer-events-none absolute h-[320px] w-[320px] rounded-full border border-cyan-400/25 blur-[1px] animate-[pulse_4s_ease-in-out_infinite]" />
 
-          {/* Card Frame */}
-          <div className="relative overflow-hidden rounded-2xl border border-white/20 bg-[#0a0f1d]/90 p-3 shadow-2xl backdrop-blur-2xl">
-            {/* Tech Corner HUD Brackets */}
-            <div className="pointer-events-none absolute top-2 left-2 h-4 w-4 border-t-2 border-l-2 border-cyan-400 z-20" />
-            <div className="pointer-events-none absolute top-2 right-2 h-4 w-4 border-t-2 border-r-2 border-cyan-400 z-20" />
-            <div className="pointer-events-none absolute bottom-2 left-2 h-4 w-4 border-b-2 border-l-2 border-violet-400 z-20" />
-            <div className="pointer-events-none absolute bottom-2 right-2 h-4 w-4 border-b-2 border-r-2 border-violet-400 z-20" />
+          {/* Floating status pill */}
+          <div className="absolute top-2 right-4 z-20 flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-black/75 px-3 py-1 shadow-lg backdrop-blur-md">
+            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="font-mono text-[10px] uppercase tracking-wider text-emerald-200">
+              Open to Collaborate
+            </span>
+          </div>
 
-            {/* Photo Container */}
-            <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-slate-900">
-              <img
-                src={PERSON.photoSrc}
-                alt={`${PERSON.name} - Computer Engineering Student`}
-                className="h-full w-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
-              />
+          {/* The Cutout Photo standing directly on the background (NO FRAME) with glowing border */}
+          <div className="relative z-10 w-full overflow-visible">
+            <img
+              src="/profile_cutout.png"
+              alt={`${PERSON.name} portrait`}
+              className="h-auto w-full object-contain select-none transition-all duration-300"
+              style={{
+                /* Glowing contour outline border directly on photo silhouette */
+                filter:
+                  'drop-shadow(0 0 2px rgba(92,225,255,0.95)) drop-shadow(0 0 14px rgba(92,225,255,0.5)) drop-shadow(0 0 35px rgba(139,92,246,0.35))',
+              }}
+            />
+          </div>
 
-              {/* Shimmer light sweep on hover */}
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
-
-              {/* Subtle vignette gradient at bottom of photo */}
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0a0f1d] via-transparent to-transparent opacity-60" />
-            </div>
-
-            {/* Floating Status Pill (Top Right) */}
-            <div className="absolute top-6 right-6 z-20 flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-black/70 px-3 py-1 shadow-lg backdrop-blur-md">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="font-mono text-[10px] uppercase tracking-wider text-emerald-200">
-                Available to Collaborate
-              </span>
-            </div>
-
-            {/* Floating Badge (Bottom Overlay) */}
-            <div className="mt-3 flex items-center justify-between px-1">
-              <div>
-                <p className="font-sans text-sm font-bold text-white">
-                  {PERSON.name}
-                </p>
-                <p className="font-mono text-[11px] text-cyan-300">
-                  {PERSON.institutionFull}
-                </p>
-              </div>
-              <span className="rounded-full border border-cyan-400/30 bg-cyan-400/10 px-2.5 py-0.5 font-mono text-[10px] text-cyan-200">
-                CORE TECH
-              </span>
-            </div>
+          {/* Lower caption pill */}
+          <div className="relative z-20 -mt-4 flex items-center gap-3 rounded-full border border-white/15 bg-[#05070d]/85 px-4 py-1.5 shadow-xl backdrop-blur-md">
+            <span className="font-sans text-xs font-bold text-white">
+              {PERSON.name}
+            </span>
+            <span className="h-1 w-1 rounded-full bg-cyan-400" />
+            <span className="font-mono text-[11px] text-cyan-300">
+              {PERSON.institution}
+            </span>
           </div>
         </div>
       </motion.div>

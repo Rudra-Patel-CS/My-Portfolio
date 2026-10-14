@@ -42,6 +42,43 @@ export class SoundEngine {
     osc.stop(t + 0.04)
   }
 
+  /** Water-drop plink on impact */
+  plink() {
+    const ctx = this.ensure()
+    if (!ctx) return
+    const t = ctx.currentTime
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(1120, t)
+    osc.frequency.exponentialRampToValueAtTime(260, t + 0.55)
+    gain.gain.setValueAtTime(0.12, t)
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.65)
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.start(t)
+    osc.stop(t + 0.68)
+  }
+
+  /** Shimmering sparkle chime */
+  sparkle() {
+    const ctx = this.ensure()
+    if (!ctx) return
+    const t = ctx.currentTime
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.type = 'sine'
+    const freqs = [1318.5, 1567.98, 1760.0, 2093.0, 2637.0]
+    const f = freqs[Math.floor(Math.random() * freqs.length)]
+    osc.frequency.setValueAtTime(f, t)
+    gain.gain.setValueAtTime(0.03, t)
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.25)
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.start(t)
+    osc.stop(t + 0.28)
+  }
+
   /** High-tech harmonic chime for word appearance in Welcome */
   wordChime(index = 0) {
     const ctx = this.ensure()

@@ -1,19 +1,25 @@
-import { useEffect, useRef, useState } from 'react'
-import { QuantumBootScene } from './QuantumBootScene'
-import { WelcomeScene } from './WelcomeScene'
-import { sound } from '../../lib/audio'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { gsap } from 'gsap'
+import { isCoarsePointer } from '../../lib/motion'
+import { LaptopScene } from './LaptopScene'
+import { GlitchScene } from './GlitchScene'
+import { WaterDropScene } from './WaterDropScene'
+import { UniqueWelcomeText } from './UniqueWelcomeText'
 
-export const INTRO_TIMELINE = {
-  bootDuration: 2.6,
-  warpDuration: 0.8,
-  welcomeDuration: 3.4,
-  revealDuration: 0.8,
-}
+export const DURATIONS = {
+  laptop: 4.5,
+  glitch: 1.5,
+  lake: 2.5,
+  welcome: 4.5,
+  reveal: 1.5,
+} as const
 
-const T_WARP = INTRO_TIMELINE.bootDuration
-const T_WELCOME = T_WARP + INTRO_TIMELINE.warpDuration
-const T_REVEAL = T_WELCOME + INTRO_TIMELINE.welcomeDuration
-const T_TOTAL = T_REVEAL + INTRO_TIMELINE.revealDuration
+const T_GLITCH = DURATIONS.laptop // 4.5s
+const T_LAKE = T_GLITCH + DURATIONS.glitch // 6.0s
+const T_IMPACT = T_LAKE + 0.85 // 6.85s (drop hits water surface)
+const T_WELCOME = T_LAKE + DURATIONS.lake // 8.5s
+const T_REVEAL = T_WELCOME + DURATIONS.welcome // 13.0s
+const TOTAL = T_REVEAL + DURATIONS.reveal // 14.5s
 
 type IntroControllerProps = {
   soundOn: boolean
@@ -26,43 +32,55 @@ export function IntroController({
   onToggleSound,
   onComplete,
 }: IntroControllerProps) {
+  const stageRef = useRef<HTMLDivElement>(null)
   const [elapsed, setElapsed] = useState(0)
   const [showSkip, setShowSkip] = useState(false)
   const completeRef = useRef(onComplete)
   completeRef.current = onComplete
-  const warpPlayed = useRef(false)
+  const simplified = useMemo(() => isCoarsePointer(), [])
 
   useEffect(() => {
-    let start: number | null = null
-    let raf = 0
-    let mounted = true
+    const stage = stageRef.current
+    if (!stage) return
 
-    const loop = (timestamp: number) => {
-      if (!mounted) return
-      if (start === null) start = timestamp
-      const cur = (timestamp - start) / 1000
-      setElapsed(cur)
+    const proxy = { t: 0, zoom: 0.86, lid: -18, shake: 0 }
+    const tl = gsap.timeline({
+      onComplete: () => completeRef.current(),
+    })
 
-      // Trigger warp sound
-      if (cur >= T_WARP && !warpPlayed.current) {
-        warpPlayed.current = true
-        sound.warp()
-      }
+    // Scene 1: Laptop typing
+    tl.to(proxy, {
+      t: T_GLITCH,
+      zoom: 1.06,
+      lid: -14,
+      duration: DURATIONS.laptop,
+      ease: 'power1.inOut',
+      onUpdate: () => apply(proxy, stage, setElapsed),
+    })
 
-      if (cur >= T_TOTAL) {
-        completeRef.current()
-        return
-      }
+    // Scene 2: Glitch zoom into screen
+    tl.to(proxy, {
+      t: T_LAKE,
+      zoom: 14,
+      lid: -8,
+      shake: 1,
+      duration: DURATIONS.glitch,
+      ease: 'power3.in',
+      onUpdate: () => apply(proxy, stage, setElapsed),
+    })
 
-      raf = requestAnimationFrame(loop)
-    }
+    // Scene 3 & 4: Water Lake, Drop Impact, Sparkles, and Welcome Text
+    tl.to(proxy, {
+      t: TOTAL,
+      zoom: 14,
+      shake: 0,
+      duration: DURATIONS.lake + DURATIONS.welcome + DURATIONS.reveal,
+      ease: 'none',
+      onUpdate: () => apply(proxy, stage, setElapsed),
+    })
 
-    raf = requestAnimationFrame(loop)
+    const skipTimer = window.setTimeout(() => setShowSkip(true), 800)
 
-    // Show skip button after brief moment
-    const skipTimer = window.setTimeout(() => setShowSkip(true), 600)
-
-    // Keyboard shortcut to skip
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter') {
         completeRef.current()
@@ -71,55 +89,56 @@ export function IntroController({
     window.addEventListener('keydown', onKey)
 
     return () => {
-      mounted = false
-      cancelAnimationFrame(raf)
+      tl.kill()
       window.clearTimeout(skipTimer)
       window.removeEventListener('keydown', onKey)
     }
   }, [])
 
-  // Hole punch iris expand into the portfolio
+  const isGlitch = elapsed >= T_GLITCH && elapsed < T_LAKE
+  const glitchProgress = isGlitch ? (elapsed - T_GLITCH) / DURATIONS.glitch : 0
+  const showLaptop = elapsed < T_LAKE
+  const showLake = elapsed >= T_LAKE - 0.4
+  const dropVisible = elapsed >= T_LAKE && elapsed < T_IMPACT
+  const impact = elapsed >= T_IMPACT
+  const showWelcome = elapsed >= T_WELCOME
+
   const hole =
     elapsed >= T_REVEAL
-      ? Math.min(
-          160,
-          ((elapsed - T_REVEAL) / INTRO_TIMELINE.revealDuration) * 160,
-        )
+      ? Math.min(160, ((elapsed - T_REVEAL) / DURATIONS.reveal) * 160)
       : 0
-
-  const isBoot = elapsed < T_WELCOME
-  const isWarp = elapsed >= T_WARP && elapsed < T_WELCOME
-  const isWelcome = elapsed >= T_WELCOME
 
   return (
     <div
-      className="fixed inset-0 z-50 overflow-hidden bg-black transition-opacity duration-300"
+      ref={stageRef}
+      className="laptop-stage fixed inset-0 z-50 overflow-hidden bg-black"
       style={{
         WebkitMaskImage: `radial-gradient(circle at 50% 50%, transparent ${hole}%, #000 ${hole}%)`,
         maskImage: `radial-gradient(circle at 50% 50%, transparent ${hole}%, #000 ${hole}%)`,
       }}
     >
-      {/* Boot scene */}
-      {isBoot && <QuantumBootScene elapsed={elapsed} />}
-
-      {/* Warp flare flash effect */}
-      {isWarp && (
-        <div
-          className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center"
-          style={{
-            background:
-              'radial-gradient(circle, rgba(92,225,255,0.45) 0%, rgba(139,92,246,0.3) 40%, transparent 80%)',
-            opacity: Math.sin(((elapsed - T_WARP) / INTRO_TIMELINE.warpDuration) * Math.PI),
-          }}
-        >
-          <div className="h-[2px] w-full bg-cyan-200 shadow-[0_0_50px_#5ce1ff]" />
-        </div>
+      {/* 3D Laptop scene (Effect 1) */}
+      {showLaptop && (
+        <LaptopScene
+          elapsed={elapsed}
+          glitch={isGlitch}
+          simplified={simplified}
+        />
       )}
 
-      {/* Artistic Welcome scene with words arriving one by one */}
-      {isWelcome && (
-        <div className="absolute inset-0 z-30">
-          <WelcomeScene elapsed={elapsed} startTime={T_WELCOME} />
+      {/* Glitch Transition */}
+      {isGlitch && <GlitchScene progress={glitchProgress} />}
+
+      {/* Water Drop & Ripple & Sparkles (Effect 2) */}
+      {showLake && (
+        <div
+          className="absolute inset-0 z-30 transition-opacity duration-700"
+          style={{
+            opacity: Math.min(1, Math.max(0, (elapsed - (T_LAKE - 0.4)) / 0.5)),
+          }}
+        >
+          <WaterDropScene impact={impact} dropVisible={dropVisible} />
+          {showWelcome && <UniqueWelcomeText startDelay={100} charSpeed={85} />}
         </div>
       )}
 
@@ -153,4 +172,18 @@ export function IntroController({
       </button>
     </div>
   )
+}
+
+function apply(
+  proxy: { t: number; zoom: number; lid: number; shake: number },
+  stage: HTMLDivElement,
+  setElapsed: (n: number) => void,
+) {
+  const sx = proxy.shake ? (Math.random() - 0.5) * 14 : 0
+  const sy = proxy.shake ? (Math.random() - 0.5) * 10 : 0
+  stage.style.setProperty('--zoom', String(proxy.zoom))
+  stage.style.setProperty('--lid', `${proxy.lid}deg`)
+  stage.style.setProperty('--shake-x', `${sx}px`)
+  stage.style.setProperty('--shake-y', `${sy}px`)
+  setElapsed(proxy.t)
 }
