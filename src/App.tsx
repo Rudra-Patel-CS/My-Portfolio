@@ -1,107 +1,60 @@
-import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
-import { Dashboard } from './components/dashboard/Dashboard'
-import { IntroController } from './components/intro/IntroController'
-import { CustomCursor } from './components/ui/CustomCursor'
-import { Loader } from './components/ui/Loader'
-import { ParticleBackground } from './components/ui/ParticleBackground'
-import { SESSION_KEY } from './content'
-import { sound } from './lib/audio'
-import { prefersReducedMotion } from './lib/motion'
+import { useEffect, useRef } from 'react'
+import { About } from './components/About'
+import { ClickRipple, NetworkBackground } from './components/Background'
+import { Contact, Footer } from './components/Contact'
+import { Cursor } from './components/Cursor'
+import { Focus } from './components/Focus'
+import { Hero, Marquee } from './components/Hero'
+import { Journey } from './components/Journey'
+import { Nav } from './components/Nav'
+import { ProjectPage } from './components/ProjectPage'
+import { Projects } from './components/Projects'
+import { Skills } from './components/Skills'
+import { startReveals, useRoute } from './lib/fx'
 
-function preload(src: string) {
-  return new Promise<void>((resolve) => {
-    const img = new Image()
-    img.onload = () => resolve()
-    img.onerror = () => resolve()
-    img.src = src
-  })
+function Home() {
+  return (
+    <main id="main">
+      <Hero />
+      <Marquee />
+      <Projects />
+      <Focus />
+      <About />
+      <Journey />
+      <Skills />
+      <Contact />
+    </main>
+  )
 }
 
 export default function App() {
-  const [booting, setBooting] = useState(true)
-  const [showIntro, setShowIntro] = useState(false)
-  const [soundOn, setSoundOn] = useState(false)
-  const [isLight, setIsLight] = useState(false)
+  const route = useRoute()
+  const lastPage = useRef(route.page)
 
+  // Switching between home and a project page jumps instantly; in-page anchors keep smooth scrolling.
   useEffect(() => {
-    const reduced = prefersReducedMotion()
-    const played = sessionStorage.getItem(SESSION_KEY) === '1'
-    const minWait = new Promise((r) => setTimeout(r, 650))
+    const switched = lastPage.current !== route.page
+    lastPage.current = route.page
+    const behavior: ScrollBehavior = switched ? 'instant' : 'smooth'
+    if (route.page === 'project') {
+      window.scrollTo({ top: 0, behavior })
+    } else if (route.section) {
+      requestAnimationFrame(() => document.getElementById(route.section)?.scrollIntoView({ behavior }))
+    } else if (switched) {
+      window.scrollTo({ top: 0, behavior })
+    }
+  }, [route])
 
-    void Promise.all([document.fonts.ready, preload('/profile_cutout.png'), minWait]).then(
-      () => {
-        setBooting(false)
-        if (reduced || played) {
-          setShowIntro(false)
-        } else {
-          setShowIntro(true)
-        }
-      },
-    )
-  }, [])
-
-  function completeIntro() {
-    sessionStorage.setItem(SESSION_KEY, '1')
-    setShowIntro(false)
-  }
-
-  function replayIntro() {
-    sessionStorage.removeItem(SESSION_KEY)
-    setShowIntro(true)
-  }
-
-  function toggleSound() {
-    const next = !soundOn
-    setSoundOn(next)
-    sound.setMuted(!next)
-  }
-
-  function toggleTheme() {
-    const next = !isLight
-    setIsLight(next)
-    document.documentElement.classList.toggle('light', next)
-    document.documentElement.classList.toggle('dark', !next)
-  }
+  useEffect(() => startReveals(), [route])
 
   return (
-    <div className="relative min-h-svh bg-ink">
-      <ParticleBackground />
-      <CustomCursor />
-
-      <div
-        className="pointer-events-none fixed inset-0 z-0"
-        style={{
-          background:
-            'radial-gradient(ellipse at 20% 0%, rgba(59,130,246,0.16), transparent 45%), radial-gradient(ellipse at 80% 20%, rgba(139,92,246,0.12), transparent 40%)',
-        }}
-      />
-
-      {booting && <Loader />}
-
-      {!booting && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6 }}
-        >
-          <Dashboard
-            soundOn={soundOn}
-            onToggleSound={toggleSound}
-            onToggleTheme={toggleTheme}
-            isLight={isLight}
-            onReplayIntro={replayIntro}
-          />
-        </motion.div>
-      )}
-
-      {showIntro && (
-        <IntroController
-          soundOn={soundOn}
-          onToggleSound={toggleSound}
-          onComplete={completeIntro}
-        />
-      )}
-    </div>
+    <>
+      <NetworkBackground />
+      <ClickRipple />
+      <Cursor />
+      <Nav page={route.page} />
+      {route.page === 'project' ? <ProjectPage key={route.id} id={route.id} /> : <Home />}
+      <Footer />
+    </>
   )
 }
